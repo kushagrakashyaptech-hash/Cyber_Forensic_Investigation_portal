@@ -1,0 +1,29 @@
+CREATE DATABASE IF NOT EXISTS cyber_forensics;
+USE cyber_forensics;
+
+CREATE TABLE IF NOT EXISTS users (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ username VARCHAR(50) UNIQUE NOT NULL,
+ password VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cases (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ case_number VARCHAR(30) UNIQUE NOT NULL,
+ title VARCHAR(150) NOT NULL,
+ investigator VARCHAR(100) NOT NULL,
+ description VARCHAR(500),
+ status VARCHAR(30) DEFAULT 'Open'
+);
+
+CREATE TABLE IF NOT EXISTS evidence (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ case_number VARCHAR(30) NOT NULL,
+ evidence_name VARCHAR(150) NOT NULL,
+ evidence_type VARCHAR(50) NOT NULL,
+ file_path VARCHAR(500),
+ sha256 VARCHAR(64) NOT NULL,
+ status VARCHAR(30) DEFAULT 'Verified'
+);
+
+INSERT IGNORE INTO users(username,password) VALUES('admin','admin123');
