@@ -2,3 +2,9 @@ out/
 *.class 
 java.txt 
 *.jar 
+# Spring Boot web backend
+web-backend/.gradle/
+web-backend/build/
+
+# Include the Gradle Wrapper JAR
+!web-backend/gradle/wrapper/gradle-wrapper.jar
