@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyber Forensic Investigation Portal</title>
+<style>
+:root{--ink:#172333;--muted:#657487;--line:#dce3eb;--paper:#f4f6f9;--white:#fff;--navy:#142437;--navy2:#1d344c;--blue:#176b9b;--blue2:#e8f2f8;--green:#237a58;--amber:#a96816;--red:#b43d45}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 "Segoe UI",Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#101f30,#203b54)}.auth-card{width:min(440px,100%);background:#fff;padding:36px;border-radius:10px;box-shadow:0 20px 60px #0004}.brand{font-size:13px;letter-spacing:2px;font-weight:800;color:var(--blue)}.auth-card h1{font-size:25px;margin:8px 0 5px}.sub{color:var(--muted);margin:0 0 25px}.field{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}.field label{font-size:12px;font-weight:700;color:#4b5a6b}.field input,.field select,.field textarea{border:1px solid #cbd5df;border-radius:6px;padding:11px 12px;background:#fff;color:var(--ink);width:100%;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:#3983ad;box-shadow:0 0 0 3px #176b9b18}.field textarea{min-height:100px;resize:vertical}.btn{border:0;border-radius:6px;padding:10px 16px;background:var(--blue);color:white;font-weight:650}.btn:hover{background:#10577f}.btn.secondary{background:#e8edf2;color:#243649}.btn.danger{background:#a83d45}.btn.full{width:100%;padding:12px}.link{border:0;background:none;color:var(--blue);padding:0;font-weight:650}.msg{min-height:20px;color:var(--red);font-size:13px;margin:4px 0 10px}
+.app{min-height:100vh;display:flex}.side{width:245px;background:var(--navy);color:#e7edf4;padding:24px 15px;display:flex;flex-direction:column;flex-shrink:0}.side-brand{padding:5px 12px 26px;border-bottom:1px solid #ffffff20;margin-bottom:18px}.side-brand strong{display:block;font-size:16px;letter-spacing:1.3px}.side-brand span{font-size:11px;color:#a9bbca}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#c8d4df;text-align:left;padding:12px;border-radius:6px;display:flex;gap:12px;align-items:center}.nav button:hover,.nav button.active{background:var(--navy2);color:#fff}.nav .ico{width:19px;text-align:center;color:#9fc3d8}.side-foot{margin-top:auto;padding:15px 12px;color:#9eb0c0;font-size:11px;border-top:1px solid #ffffff20}
+.main{min-width:0;flex:1}.top{height:68px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px}.top small{color:var(--muted)}.top-right{display:flex;align-items:center;gap:15px}.avatar{width:32px;height:32px;border-radius:50%;background:var(--blue2);color:var(--blue);display:grid;place-items:center;font-weight:800}.content{padding:30px;max-width:1500px;margin:auto}.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:23px}.page-head h1{font-size:23px;margin:0 0 4px}.page-head p{margin:0;color:var(--muted)}.eyebrow{font-size:11px;letter-spacing:1.4px;color:var(--blue);font-weight:800;text-transform:uppercase;margin-bottom:7px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:22px}.stat,.panel{background:#fff;border:1px solid var(--line);border-radius:8px}.stat{padding:18px 20px}.stat .label{color:var(--muted);font-size:12px;font-weight:650}.stat .num{font-size:30px;font-weight:750;margin-top:5px}.stat .hint{font-size:11px;color:#8390a0}.panel{padding:21px;margin-bottom:18px}.panel h2{font-size:16px;margin:0 0 15px}.grid2{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:600px}th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#718094;background:#f7f9fb;padding:12px;border-bottom:1px solid var(--line)}td{padding:13px 12px;border-bottom:1px solid #edf0f3;font-size:13px}tr:last-child td{border-bottom:0}.status{display:inline-block;border-radius:20px;padding:4px 9px;font-size:11px;font-weight:750;background:#edf1f5;color:#566575}.status.SUBMITTED,.status.PENDING,.status.UNDER.REVIEW{background:#fff3df;color:#966018}.status.UNDER.INVESTIGATION,.status.EVIDENCE.ANALYSIS{background:#e6f1fa;color:#21658e}.status.RESOLVED,.status.CLOSED{background:#e6f4ec;color:#28734d}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}.span2{grid-column:1/-1}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:15px}.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed #cbd5df;border-radius:7px}.notice{padding:12px 14px;border-radius:6px;background:#eef5fa;color:#35566d;margin-bottom:15px}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.timeline{border-left:2px solid #d9e4ec;margin:10px 0 0 8px;padding-left:20px}.timeline-item{position:relative;padding:0 0 19px}.timeline-item:before{content:"";position:absolute;left:-26px;top:5px;width:10px;height:10px;border-radius:50%;background:#347da5;border:2px solid white;box-shadow:0 0 0 1px #347da5}.muted{color:var(--muted)}.hidden{display:none!important}
+@media(max-width:950px){.side{width:210px}.stats{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+@media(max-width:650px){.app{display:block}.side{width:100%;padding:12px}.side-brand{padding:6px 8px 12px;margin-bottom:8px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;padding:9px}.side-foot{display:none}.top{padding:0 16px}.content{padding:18px}.stats{gap:9px}.stat{padding:13px}.stat .num{font-size:24px}.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}.page-head{display:block}.page-head .btn{margin-top:12px}}
+</style>
+</head>
+<body>
+<section class="auth-wrap" id="auth">
+ <div class="auth-card" id="loginBox">
+  <div class="brand">CYBER FORENSIC SERVICES</div><h1>Sign in to your portal</h1><p class="sub">Citizen complaint and digital evidence management</p>
+  <form id="loginForm"><div class="field"><label>USERNAME OR EMAIL</label><input id="loginId" autocomplete="username" required></div><div class="field"><label>PASSWORD</label><input id="loginPass" type="password" autocomplete="current-password" required></div><div class="msg" id="loginMsg"></div><button class="btn full">Sign in</button></form>
+  <p class="muted">New citizen? <button class="link" type="button" onclick="showAuth('registerBox')">Create an account</button></p>
+ </div>
+ <div class="auth-card hidden" id="registerBox">
+  <div class="brand">CYBER FORENSIC SERVICES</div><h1>Citizen registration</h1><p class="sub">Create an account to report and track cybercrime.</p>
+  <form id="registerForm">
+   <div class="field"><label>USERNAME *</label><input id="regUsername" required></div><div class="field"><label>FULL NAME *</label><input id="regName" required></div>
+   <div class="field"><label>EMAIL *</label><input id="regEmail" type="email" required></div><div class="field"><label>MOBILE NUMBER</label><input id="regMobile" required></div><div class="field"><label>PASSWORD (MINIMUM 8 CHARACTERS) *</label><input id="regPassword" type="password" minlength="8" required></div>
+   <div class="msg" id="registerMsg"></div><button class="btn full">Create account</button>
+  </form><p class="muted">Already registered? <button class="link" type="button" onclick="showAuth('loginBox')">Sign in</button></p>
+ </div>
+</section>
+<div class="app hidden" id="app">
+ <aside class="side">
+  <div class="side-brand"><strong>CYBER FORENSIC</strong><span>INVESTIGATION PORTAL</span></div>
+  <nav class="nav" id="nav">
+   <button data-page="dashboard" class="active"><span class="ico">▦</span>Dashboard</button>
+   <button data-page="report"><span class="ico">＋</span>Report cybercrime</button>
+   <button data-page="reports"><span class="ico">▤</span>My reports</button>
+   <button data-page="track"><span class="ico">⌕</span>Track complaint</button>
+   <button data-page="evidence"><span class="ico">⬆</span>Submit evidence</button>
+   <button data-page="notifications"><span class="ico">♧</span>Notifications</button>
+   <button data-page="profile"><span class="ico">◉</span>My profile</button>
+  </nav>
+  <div class="side-foot">CONFIDENTIAL • CITIZEN ACCESS<br>For cyber financial fraud, call 1930.</div>
+ </aside>
+ <main class="main"><header class="top"><div><b id="topTitle">Dashboard</b><br><small>Cybercrime reporting and investigation system</small></div><div class="top-right"><span id="userName" class="muted"></span><div class="avatar" id="avatar">U</div><button class="btn secondary" onclick="logout()">Sign out</button></div></header><div class="content" id="view"></div></main>
+</div>
+<script>
+let currentUser=null, activePage='dashboard';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nice=s=>String(s||'').replaceAll('_',' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+async function api(url,opts={}){const r=await fetch(url,{credentials:'same-origin',...opts,headers:opts.body instanceof FormData?{}:{'Content-Type':'application/json',...(opts.headers||{})}});let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.message||d.error||`Request failed (${r.status})`);return d}
+function showAuth(id){$('loginBox').classList.toggle('hidden',id!=='loginBox');$('registerBox').classList.toggle('hidden',id!=='registerBox')}
+function setMessage(id,msg){$(id).textContent=msg||''}
+function enter(user){currentUser=user;$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('userName').textContent=user.fullName||user.username;$('avatar').textContent=(user.fullName||user.username||'U').charAt(0).toUpperCase();navigate('dashboard')}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();setMessage('loginMsg','Signing in…');try{enter(await api('/api/auth/login',{method:'POST',body:JSON.stringify({identifier:$('loginId').value.trim(),password:$('loginPass').value})}))}catch(x){setMessage('loginMsg',x.message)}});
+$('registerForm').addEventListener('submit',async e=>{e.preventDefault();setMessage('registerMsg','Creating account…');try{enter(await api('/api/auth/register',{method:'POST',body:JSON.stringify({username:$('regUsername').value.trim(),fullName:$('regName').value.trim(),email:$('regEmail').value.trim(),mobileNumber:$('regMobile').value.trim(),password:$('regPassword').value})}))}catch(x){setMessage('registerMsg',x.message)}});
+$('nav').addEventListener('click',e=>{const b=e.target.closest('button[data-page]');if(b)navigate(b.dataset.page)});
+const titles={dashboard:'Dashboard',report:'Report cybercrime',reports:'My reports',track:'Track complaint',evidence:'Submit digital evidence',notifications:'Notifications',profile:'My profile'};
+async function navigate(page){activePage=page;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));$('topTitle').textContent=titles[page];$('view').innerHTML='<div class="empty">Loading portal data…</div>';try{await ({dashboard:dashboard,reports:reports,report:reportForm,track:track,evidence:evidence,notifications:notifications,profile:profile}[page])()}catch(e){$('view').innerHTML=`<div class="notice">${esc(e.message)}</div>`}}
+function head(title,desc,action=''){return `<div class="page-head"><div><div class="eyebrow">Citizen services</div><h1>${title}</h1><p>${desc}</p></div>${action}</div>`}
+function status(s){return `<span class="status ${esc(String(s||'').toUpperCase().split(/\s+/).join(' '))}">${esc(nice(s))}</span>`}
+async function dashboard(){const d=await api('/api/dashboard');const rows=d.recent||[];$('view').innerHTML=head('Your case overview','A live summary of complaints linked to your account.')+`<section class="stats">
+<div class="stat"><div class="label">TOTAL REPORTS</div><div class="num">${d.total}</div><div class="hint">Complaints submitted</div></div>
+<div class="stat"><div class="label">PENDING</div><div class="num">${d.pending}</div><div class="hint">Awaiting review</div></div>
+<div class="stat"><div class="label">UNDER INVESTIGATION</div><div class="num">${d.investigating}</div><div class="hint">Currently being examined</div></div>
+<div class="stat"><div class="label">RESOLVED</div><div class="num">${d.resolved}</div><div class="hint">Completed cases</div></div></section>
+<div class="grid2"><section class="panel"><h2>Recent complaints</h2>${rows.length?tableReports(rows):'<div class="empty">No complaints have been submitted yet.</div>'}</section><section class="panel"><h2>Important information</h2><div class="notice">For immediate assistance with cyber financial fraud in India, call <b>1930</b> and report at the National Cyber Crime Reporting Portal.</div><p class="muted">Keep transaction references, screenshots, email headers and other original evidence safe. Do not alter the original files.</p><button class="btn" onclick="navigate('report')">File a complaint</button></section></div>`}
+function tableReports(rows){const isAdmin=currentUser&&currentUser.role==='ADMIN';return `<div class="table-wrap"><table><thead><tr><th>Report ID</th>${isAdmin?'<th>Citizen</th>':''}<th>Category</th><th>Status</th><th>Submitted</th>${isAdmin?'<th>Action</th>':''}</tr></thead><tbody>${rows.map(r=>{const id=r.report_id||r.reportId;return `<tr><td><button class="link" onclick="openTrack('${esc(id)}')">${esc(id)}</button></td>${isAdmin?`<td>${esc(r.victim_name||'')}</td>`:''}<td>${esc(r.crime_category||r.category)}</td><td>${status(r.status)}</td><td>${esc(String(r.created_at||r.createdAt||'').slice(0,10))}</td>${isAdmin?`<td><button class="btn secondary" onclick="adminUpdate('${esc(id)}')">Update case</button></td>`:''}</tr>`}).join('')}</tbody></table></div>`}
+async function adminUpdate(id){const statusValue=prompt('New status: SUBMITTED, UNDER REVIEW, UNDER INVESTIGATION, EVIDENCE ANALYSIS, RESOLVED or CLOSED');if(!statusValue)return;const unit=prompt('Assigned investigation unit','Cyber Crime Cell Unit 1')||'Cyber Crime Cell Unit 1';const remarks=prompt('Investigator remarks','')||'';try{await api('/api/reports/'+encodeURIComponent(id)+'/status',{method:'PATCH',body:JSON.stringify({status:statusValue.toUpperCase(),assignedUnit:unit,remarks})});alert('Case updated and citizen notified.');navigate(activePage)}catch(e){alert(e.message)}}
+async function reports(){const rows=await api('/api/reports');$('view').innerHTML=head(currentUser.role==='ADMIN'?'All complaints':'My reports',currentUser.role==='ADMIN'?'Review and update citizen complaints.':'Review every complaint submitted through your account.',`<button class="btn" onclick="navigate('report')">＋ New complaint</button>`)+`<section class="panel">${rows.length?tableReports(rows):'<div class="empty">You have not filed a complaint yet. Select “New complaint” to begin.</div>'}</section>`}
+function reportForm(){$('view').innerHTML=head('Submit a cybercrime complaint','Provide accurate incident details. Fields marked * are required.')+`<form id="complaintForm" class="panel"><h2>Victim and incident details</h2><div class="form-grid">
+${field('Victim name *','victimName','text',currentUser.fullName)}${field('Email address *','email','email',currentUser.email)}${field('Mobile number *','mobileNumber','tel',currentUser.mobileNumber)}
+<div class="field"><label>CRIME CATEGORY *</label><select name="crimeCategory" required><option>Financial Fraud</option><option>UPI Fraud</option><option>Online Banking Fraud</option><option>Cryptocurrency Fraud</option><option>Phishing</option><option>Identity Theft</option><option>Social Media Fraud</option><option>Cyberbullying</option><option>Hacking</option><option>Other</option></select></div>
+${field('Incident date *','incidentDate','date')}${field('Incident location','location')}${field('Amount lost (₹)','amountLost','number')}
+<div class="field span2"><label>INCIDENT DESCRIPTION *</label><textarea name="description" required placeholder="Describe what happened, including dates, times and actions taken."></textarea></div>
+<h2 class="span2">Suspect and digital transaction details</h2>${field('Suspect name','suspectName')}${field('Suspect phone','suspectPhone')}${field('Suspect email','suspectEmail')}${field('Wallet address','walletAddress')}${field('Transaction hash / UTR','transactionHash')}${field('Website / social media URL','websiteUrl')}
+<div class="field span2"><label>ADDITIONAL DETAILS</label><textarea name="additionalDetails" placeholder="Any other relevant information"></textarea></div></div><div class="actions"><button type="reset" class="btn secondary">Clear form</button><button class="btn">Submit complaint</button></div><div class="msg" id="formMsg"></div></form>`;
+$('complaintForm').addEventListener('submit',async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(e.target).entries());try{const d=await api('/api/reports',{method:'POST',body:JSON.stringify(b)});$('formMsg').style.color='green';$('formMsg').textContent=`Submitted successfully. Your report ID is ${d.reportId}.`;e.target.reset();setTimeout(()=>{navigate('track');setTimeout(()=>$('trackId').value=d.reportId,100)},1000)}catch(x){$('formMsg').textContent=x.message}})}
+function field(label,name,type='text',value=''){return `<div class="field"><label>${label.toUpperCase()}</label><input name="${name}" type="${type}" value="${esc(value||'')}" ${label.includes('*')?'required':''}></div>`}
+function openTrack(id){navigate('track').then(()=>{setTimeout(()=>{$('trackId').value=id;loadTrack()},50)})}
+function track(){$('view').innerHTML=head('Track a complaint','Enter your report reference to view its latest investigation status.')+`<section class="panel"><form id="trackForm" class="row"><div class="field" style="flex:1;min-width:220px;margin:0"><label>REPORT REFERENCE</label><input id="trackId" placeholder="Example: CF-2026-0001" required></div><button class="btn">Find complaint</button></form><div id="trackResult" style="margin-top:20px"></div></section>`;$('trackForm').addEventListener('submit',e=>{e.preventDefault();loadTrack()})}
+async function loadTrack(){const id=$('trackId').value.trim();if(!id)return;const box=$('trackResult');box.innerHTML='Searching…';try{const r=await api('/api/reports/'+encodeURIComponent(id));box.innerHTML=`<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Complaint reference</div><h2>${esc(r.report_id)}</h2></div>${status(r.status)}</div><div class="form-grid"><p><b>Category</b><br>${esc(r.crime_category)}</p><p><b>Date submitted</b><br>${esc(String(r.created_at||'').slice(0,10))}</p><p><b>Assigned unit</b><br>${esc(r.assigned_unit||'Not assigned')}</p><p><b>Last updated</b><br>${esc(String(r.updated_at||'').slice(0,10))}</p><p class="span2"><b>Investigator remarks</b><br>${esc(r.investigator_remarks||'No remarks have been added yet.')}</p></div><h2>Investigation progress</h2><div class="timeline"><div class="timeline-item"><b>Complaint received</b><div class="muted">${esc(String(r.created_at||'').slice(0,16))}</div></div><div class="timeline-item"><b>Current status: ${esc(nice(r.status))}</b><div class="muted">The assigned unit will update this status as the investigation progresses.</div></div></div>`}catch(e){box.innerHTML=`<div class="notice">${esc(e.message)}</div>`}}
+async function evidence(){
+ const rows=await api('/api/evidence');
+ $('view').innerHTML=head(
+  'Digital evidence',
+  'Submit files that support one of your complaints. Each upload is linked to its report reference.'
+ )+`<section class="panel">
+  <h2>Submit evidence</h2>
+  <form id="evidenceForm">
+   <div class="form-grid">
+    ${field('Report ID *','reportId')}
+    <div class="field">
+     <label>SELECT FILE *</label>
+     <input type="file" name="file" required>
+    </div>
+    <div class="field span2">
+     <label>DESCRIPTION</label>
+     <textarea name="description" placeholder="Describe the file and explain how it relates to your complaint."></textarea>
+    </div>
+   </div>
+   <div class="actions"><button class="btn" type="submit">Submit evidence</button></div>
+   <div class="msg" id="evidenceMsg" role="status" aria-live="polite"></div>
+  </form>
+ </section>
+ <section class="panel">
+  <h2>Evidence register</h2>
+  ${rows.length?`<div class="table-wrap"><table><thead><tr><th>File</th><th>Report ID</th><th>Type</th><th>Uploaded</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.evidence_name)}</td><td>${esc(r.report_id)}</td><td>${esc(r.evidence_type)}</td><td>${esc(String(r.uploaded_at||'').slice(0,10))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No evidence files have been submitted yet.</div>'}
+ </section>`;
+ $('evidenceForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const form=e.currentTarget;
+  const button=form.querySelector('button[type="submit"]');
+  const message=$('evidenceMsg');
+  const fd=new FormData(form);
+  button.disabled=true;
+  button.textContent='Submitting…';
+  message.style.color='';
+  message.textContent='Uploading your evidence…';
+  try{
+   const d=await api('/api/evidence',{method:'POST',body:fd});
+   message.style.color='green';
+   message.textContent=d.message||'Evidence submitted successfully.';
+   form.reset();
+   setTimeout(()=>navigate('evidence'),1200);
+  }catch(x){
+   message.textContent=x.message||'Evidence could not be submitted. Please try again.';
+  }finally{
+   button.disabled=false;
+   button.textContent='Submit evidence';
+  }
+ });
+}
+async function notifications(){const rows=await api('/api/notifications');$('view').innerHTML=head('Notifications','Updates related to your complaints and account.',`<button class="btn secondary" id="markRead">Mark all as read</button>`)+`<section class="panel">${rows.length?rows.map(n=>`<div style="padding:14px 4px;border-bottom:1px solid #edf0f3"><div class="row" style="justify-content:space-between"><b>${esc(n.report_id||'Portal update')}</b>${n.is_read?'<span class="muted">Read</span>':'<span class="status">New</span>'}</div><p>${esc(n.message)}</p><small class="muted">${esc(String(n.created_at||'').slice(0,16))}</small></div>`).join(''):'<div class="empty">You have no notifications.</div>'}</section>`;$('markRead').onclick=async()=>{await api('/api/notifications/read',{method:'POST'});notifications()}}
+async function profile(){$('view').innerHTML=head('My profile','Manage the contact details associated with your citizen account.')+`<section class="panel"><h2>Account details</h2><form id="profileForm"><div class="form-grid">${field('Username','username','text',currentUser.username)}${field('Full name *','fullName','text',currentUser.fullName)}${field('Email address *','email','email',currentUser.email)}${field('Mobile number','mobileNumber','tel',currentUser.mobileNumber)}</div><div class="actions"><button class="btn">Save changes</button></div><div class="msg" id="profileMsg"></div></form></section><section class="panel"><h2>Change password</h2><form id="passwordForm"><div class="form-grid">${field('Current password *','currentPassword','password')}${field('New password *','newPassword','password')}</div><div class="actions"><button class="btn">Update password</button></div><div class="msg" id="passwordMsg"></div></form></section>`;
+$('profileForm').querySelector('[name=username]').readOnly=true; $('profileForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{const u=await api('/api/profile',{method:'PUT',body:JSON.stringify({fullName:f.get('fullName'),email:f.get('email'),mobileNumber:f.get('mobileNumber')})});currentUser=u;$('userName').textContent=u.fullName;$('profileMsg').style.color='green';$('profileMsg').textContent='Profile updated.'}catch(x){$('profileMsg').textContent=x.message}};
+$('passwordForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{const d=await api('/api/profile/password',{method:'PUT',body:JSON.stringify({currentPassword:f.get('currentPassword'),newPassword:f.get('newPassword')})});$('passwordMsg').style.color='green';$('passwordMsg').textContent=d.message;e.target.reset()}catch(x){$('passwordMsg').textContent=x.message}}}
+async function logout(){try{await api('/api/auth/logout',{method:'POST'})}catch{}currentUser=null;$('app').classList.add('hidden');$('auth').classList.remove('hidden');$('loginForm').reset();showAuth('loginBox')}
+(async()=>{try{const u=await api('/api/auth/me');enter(u)}catch{showAuth('loginBox')}})();
+</script></body></html>
