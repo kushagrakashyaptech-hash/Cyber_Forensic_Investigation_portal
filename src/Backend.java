@@ -1,4 +1,6 @@
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.sql.*;
 import java.util.*;
@@ -10,7 +12,7 @@ public class Backend {
     private static final String URL =
         "jdbc:mysql://localhost:3306/cyber_forensics?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String USER = "root";
-    private static final String PASSWORD = "anku";
+    private static final String PASSWORD = "***REMOVED***";
 
     private static boolean dbInitialized = false;
 
@@ -103,6 +105,16 @@ public class Backend {
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                     "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)");
 
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS investigation_timeline (" +
+                    "id INT PRIMARY KEY AUTO_INCREMENT, " +
+                    "report_id VARCHAR(30) NOT NULL, " +
+                    "event_type VARCHAR(50) NOT NULL, " +
+                    "status VARCHAR(50), " +
+                    "assigned_unit VARCHAR(100), " +
+                    "remarks TEXT, " +
+                    "done_by VARCHAR(100), " +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+
                 // Default admin and user accounts
                 stmt.executeUpdate("INSERT IGNORE INTO users(username, password, role, full_name, email, mobile_number) " +
                     "VALUES('admin', 'admin123', 'ADMIN', 'System Administrator', 'admin@cyberforensics.gov', '9876543210')");
@@ -184,6 +196,15 @@ public class Backend {
         public UserNotification(int id, int userId, String reportId, String message, boolean isRead, String createdAt) {
             this.id = id; this.userId = userId; this.reportId = reportId;
             this.message = message; this.isRead = isRead; this.createdAt = createdAt;
+        }
+    }
+
+    public static class TimelineEvent {
+        public int id;
+        public String reportId, eventType, status, assignedUnit, remarks, doneBy, createdAt;
+        public TimelineEvent(int id, String reportId, String eventType, String status, String assignedUnit, String remarks, String doneBy, String createdAt) {
+            this.id = id; this.reportId = reportId; this.eventType = eventType; this.status = status;
+            this.assignedUnit = assignedUnit; this.remarks = remarks; this.doneBy = doneBy; this.createdAt = createdAt;
         }
     }
 
@@ -343,6 +364,7 @@ public class Backend {
         }
 
         createNotification(r.userId, r.reportId, "Your report " + r.reportId + " has been submitted successfully.");
+        addTimelineEvent(r.reportId, "COMPLAINT SUBMITTED", r.status, r.assignedUnit, "Complaint submitted by citizen (" + r.crimeCategory + ").", "Citizen: " + r.victimName);
         return r.reportId;
     }
 
@@ -385,6 +407,10 @@ public class Backend {
     }
 
     public boolean updateReportStatus(String reportId, String newStatus, String assignedUnit, String remarks) throws SQLException {
+        return updateReportStatus(reportId, newStatus, assignedUnit, remarks, "Admin");
+    }
+
+    public boolean updateReportStatus(String reportId, String newStatus, String assignedUnit, String remarks, String doneBy) throws SQLException {
         CybercrimeReport report = getReportById(reportId);
         if (report == null) throw new SQLException("Report ID not found: " + reportId);
 
@@ -397,6 +423,7 @@ public class Backend {
             boolean updated = p.executeUpdate() > 0;
             if (updated) {
                 createNotification(report.userId, reportId, "Your report " + reportId + " status updated to " + newStatus + ".");
+                addTimelineEvent(reportId, "STATUS UPDATED", newStatus, assignedUnit, remarks, "Admin: " + doneBy);
             }
             return updated;
         }
@@ -504,6 +531,7 @@ public class Backend {
         }
 
         createNotification(userId, reportId, "New evidence '" + name + "' uploaded for report " + reportId + ".");
+        addTimelineEvent(reportId, "EVIDENCE UPLOADED", rep.status, rep.assignedUnit, "Evidence '" + name + "' (" + type + ") uploaded by citizen.", "Citizen: " + rep.victimName);
     }
 
     public List<EvidenceRecord> getEvidenceByReport(String reportId) throws SQLException {
@@ -598,5 +626,137 @@ public class Backend {
             p.setInt(1, userId);
             p.executeUpdate();
         }
+    }
+
+
+    public void addTimelineEvent(String reportId, String eventType, String status, String assignedUnit, String remarks, String doneBy) throws SQLException {
+        String sql = "INSERT INTO investigation_timeline(report_id, event_type, status, assigned_unit, remarks, done_by) VALUES(?,?,?,?,?,?)";
+        try (Connection c = connect(); PreparedStatement p = c.prepareStatement(sql)) {
+            p.setString(1, reportId);
+            p.setString(2, eventType);
+            p.setString(3, status);
+            p.setString(4, assignedUnit);
+            p.setString(5, remarks);
+            p.setString(6, doneBy);
+            p.executeUpdate();
+        }
+    }
+
+    public void addInvestigationNote(String reportId, String note, String adminUsername) throws SQLException {
+        CybercrimeReport report = getReportById(reportId);
+        if (report == null) throw new SQLException("Report ID not found: " + reportId);
+        addTimelineEvent(reportId, "INVESTIGATION NOTE", report.status, report.assignedUnit, note, "Admin: " + adminUsername);
+    }
+
+    public List<TimelineEvent> getTimeline(String reportId) throws SQLException {
+        List<TimelineEvent> list = new ArrayList<>();
+        CybercrimeReport report = getReportById(reportId);
+        if (report == null) throw new SQLException("Report ID not found: " + reportId);
+
+        String sql = "SELECT * FROM investigation_timeline WHERE report_id=? ORDER BY created_at ASC, id ASC";
+        try (Connection c = connect(); PreparedStatement p = c.prepareStatement(sql)) {
+            p.setString(1, reportId.trim());
+            try (ResultSet r = p.executeQuery()) {
+                while (r.next()) {
+                    list.add(new TimelineEvent(
+                        r.getInt("id"),
+                        r.getString("report_id"),
+                        r.getString("event_type"),
+                        r.getString("status"),
+                        r.getString("assigned_unit"),
+                        r.getString("remarks"),
+                        r.getString("done_by"),
+                        r.getString("created_at")
+                    ));
+                }
+            }
+        }
+
+        boolean hasSubmitEvent = false;
+        for (TimelineEvent e : list) {
+            if ("COMPLAINT SUBMITTED".equals(e.eventType)) hasSubmitEvent = true;
+        }
+        if (!hasSubmitEvent) {
+            list.add(0, new TimelineEvent(0, report.reportId, "COMPLAINT SUBMITTED", "SUBMITTED", report.assignedUnit,
+                "Complaint submitted by citizen (" + report.crimeCategory + ").", "Citizen: " + report.victimName, report.createdAt));
+        }
+        return list;
+    }
+
+
+    public Map<String, Integer> getAdminStats() throws SQLException {
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("total", 0);
+        stats.put("pending", 0);
+        stats.put("investigating", 0);
+        stats.put("resolved", 0);
+
+        List<CybercrimeReport> reports = getAllUserReports();
+        stats.put("total", reports.size());
+        for (CybercrimeReport r : reports) {
+            String s = r.status == null ? "" : r.status.toUpperCase();
+            if (s.contains("REVIEW") || s.contains("INVESTIGATION") || s.contains("EVIDENCE")) {
+                stats.put("investigating", stats.get("investigating") + 1);
+            } else if (s.contains("RESOLVED") || s.contains("CLOSED")) {
+                stats.put("resolved", stats.get("resolved") + 1);
+            } else {
+                stats.put("pending", stats.get("pending") + 1);
+            }
+        }
+
+        try (Connection c = connect(); PreparedStatement p = c.prepareStatement("SELECT COUNT(*) FROM evidence"); ResultSet r = p.executeQuery()) {
+            stats.put("evidence", r.next() ? r.getInt(1) : 0);
+        }
+        return stats;
+    }
+
+    public Map<String, Integer> getCountByCategory() throws SQLException {
+        Map<String, Integer> map = new LinkedHashMap<>();
+        String sql = "SELECT crime_category, COUNT(*) FROM cybercrime_reports GROUP BY crime_category ORDER BY COUNT(*) DESC";
+        try (Connection c = connect(); PreparedStatement p = c.prepareStatement(sql); ResultSet r = p.executeQuery()) {
+            while (r.next()) map.put(r.getString(1), r.getInt(2));
+        }
+        return map;
+    }
+
+    public Map<String, Integer> getCountByStatus() throws SQLException {
+        Map<String, Integer> map = new LinkedHashMap<>();
+        String sql = "SELECT status, COUNT(*) FROM cybercrime_reports GROUP BY status ORDER BY COUNT(*) DESC";
+        try (Connection c = connect(); PreparedStatement p = c.prepareStatement(sql); ResultSet r = p.executeQuery()) {
+            while (r.next()) map.put(r.getString(1), r.getInt(2));
+        }
+        return map;
+    }
+
+    public double getTotalAmountLost() throws SQLException {
+        double total = 0;
+        for (CybercrimeReport r : getAllUserReports()) {
+            if (r.amountLost == null || r.amountLost.isBlank()) continue;
+            String clean = r.amountLost.replaceAll("[^0-9.]", "");
+            try {
+                total += Double.parseDouble(clean);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return total;
+    }
+
+    public int exportReportsToCsv(String filePath) throws Exception {
+        List<CybercrimeReport> reports = getAllUserReports();
+        try (PrintWriter out = new PrintWriter(new FileWriter(filePath))) {
+            out.println("Report ID,Victim Name,Email,Mobile,Crime Category,Incident Date,Location,Amount Lost,Status,Assigned Unit,Investigator Remarks,Submitted On,Last Updated");
+            for (CybercrimeReport r : reports) {
+                out.println(String.join(",",
+                    csv(r.reportId), csv(r.victimName), csv(r.email), csv(r.mobileNumber), csv(r.crimeCategory),
+                    csv(r.incidentDate), csv(r.location), csv(r.amountLost), csv(r.status), csv(r.assignedUnit),
+                    csv(r.investigatorRemarks), csv(r.createdAt), csv(r.updatedAt)));
+            }
+        }
+        return reports.size();
+    }
+
+    private String csv(String value) {
+        if (value == null) return "";
+        return "\"" + value.replace("\"", "\"\"").replace("\r", " ").replace("\n", " ") + "\"";
     }
 }
